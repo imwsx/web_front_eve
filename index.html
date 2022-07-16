@@ -5,6 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>大事件-主页</title>
+    <link rel="stylesheet" href="assets/css/icomoon.css" />
     <link rel="stylesheet" href="assets/lib/layui/css/layui.css" />
     <link rel="stylesheet" href="assets/css/index.css" />
   </head>
@@ -21,29 +22,18 @@
           >
             <i class="layui-icon layui-icon-spread-left"></i>
           </li>
-
-          <li class="layui-nav-item layui-hide-xs"><a href="">nav 1</a></li>
-          <li class="layui-nav-item layui-hide-xs"><a href="">nav 2</a></li>
-          <li class="layui-nav-item layui-hide-xs"><a href="">nav 3</a></li>
-          <li class="layui-nav-item">
-            <a href="javascript:;">nav groups</a>
-            <dl class="layui-nav-child">
-              <dd><a href="">menu 11</a></dd>
-              <dd><a href="">menu 22</a></dd>
-              <dd><a href="">menu 33</a></dd>
-            </dl>
-          </li>
         </ul>
         <ul class="layui-nav layui-layout-right">
           <li class="layui-nav-item">
             <a href="javascript:;" class="userinfo">
-              <img src="#" class="layui-nav-img" />
+              <img src="" class="layui-nav-img" />
               <span class="text-avatar">A</span>
               <span id="name">user</span>
             </a>
             <dl class="layui-nav-child">
-              <dd><a href="">基本资料</a></dd>
-              <dd><a href="">设置</a></dd>
+              <dd><a href="javascript:;">基本资料</a></dd>
+              <dd><a href="javascript:;">更换头像</a></dd>
+              <dd><a href="javascript:;">重置密码</a></dd>
               <dd><a href="javascript:;" id="btnSignout">注销</a></dd>
             </dl>
           </li>
@@ -64,25 +54,57 @@
           </div>
 
           <!-- 左侧导航区域（可配合layui已有的垂直导航） -->
-          <ul class="layui-nav layui-nav-tree" lay-filter="test">
-            <li class="layui-nav-item">
-              <a href="javascript:;">主页</a>
+          <ul class="layui-nav layui-nav-tree" lay-shrink="all">
+            <li class="layui-nav-item layui-this">
+              <a href="./home/dashboard.html" target="fm">
+                <span class="icon-home"></span>
+                <span class="text-padding">主页</span>
+              </a>
             </li>
-            <li class="layui-nav-item layui-nav-itemed">
-              <a class="" href="javascript:;">文章管理</a>
+            <li class="layui-nav-item">
+              <a href="javascript:;">
+                <span class="icon-article"></span>
+                <span class="text-padding">文章管理</span>
+              </a>
               <dl class="layui-nav-child">
-                <dd><a href="javascript:;">menu 1</a></dd>
-                <dd><a href="javascript:;">menu 2</a></dd>
-                <dd><a href="javascript:;">menu 3</a></dd>
-                <dd><a href="">the links</a></dd>
+                <dd>
+                  <a href="javascript:;">
+                    <i class="layui-icon layui-icon-app icon-margin"></i>文章类别</a
+                  >
+                </dd>
+                <dd>
+                  <a href="javascript:;">
+                    <i class="layui-icon layui-icon-list icon-margin"></i>文章列表</a
+                  >
+                </dd>
+                <dd>
+                  <a href="javascript:;">
+                    <i class="layui-icon layui-icon-release icon-margin"></i>发布文章</a
+                  >
+                </dd>
               </dl>
             </li>
             <li class="layui-nav-item">
-              <a href="javascript:;">个人中心</a>
+              <a href="javascript:;">
+                <span class="icon-user"></span>
+                <span class="text-padding">个人中心</span>
+              </a>
               <dl class="layui-nav-child">
-                <dd><a href="javascript:;">list 1</a></dd>
-                <dd><a href="javascript:;">list 2</a></dd>
-                <dd><a href="">超链接</a></dd>
+                <dd>
+                  <a href="javascript:;">
+                    <i class="layui-icon layui-icon-form icon-margin"></i>基本资料</a
+                  >
+                </dd>
+                <dd>
+                  <a href="javascript:;">
+                    <i class="layui-icon layui-icon-face-smile icon-margin"></i>更换头像</a
+                  >
+                </dd>
+                <dd>
+                  <a href="javascript:;">
+                    <i class="layui-icon layui-icon-password icon-margin"></i>重置密码</a
+                  >
+                </dd>
               </dl>
             </li>
           </ul>
@@ -91,14 +113,14 @@
 
       <div class="layui-body">
         <!-- 内容主体区域 -->
-        <div style="padding: 15px">
-          内容主体区域。记得修改 layui.css 和 js 的路径
-        </div>
+        <iframe name="fm" src="./home/dashboard.html" frameborder="0"></iframe>
       </div>
 
       <div class="layui-footer">
         <!-- 底部固定区域 -->
-        底部固定区域
+        <a href="https://github.com/imwsx/web_front_eve"
+          ><span class="icon-github"></span>github</a
+        >
       </div>
     </div>
 
