@@ -56,3 +56,7 @@ body {
 #file {
     display: none;
 }
+
+.style-upload {
+    margin-right: 5px;
+}
