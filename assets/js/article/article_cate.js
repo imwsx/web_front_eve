@@ -98,6 +98,7 @@ $(function () {
   });
 
   $("tbody").on("click", "#btn-delete", function () {
+    console.log(this);
     var id = $(this).attr("data-id");
     layer.confirm(
       "确定删除该文章类别?",

@@ -23,7 +23,7 @@ $(function () {
   }
 
   template.defaults.imports.getState = (state) => {
-    if (Boolean(+state)) {
+    if (Boolean(state)) {
       return "草稿";
     } else {
       return "已发布";
@@ -32,7 +32,7 @@ $(function () {
 
   var q = {
     pagenum: 1,
-    pagesize: 1,
+    pagesize: 10,
     cate_id: "",
     state: "",
   };
@@ -96,8 +96,8 @@ $(function () {
       limits: [2, 3, 5, 10],
       curr: q.pagenum,
       // jump 触发回调方式
-        // 1. 点击页码
-        // 2. 调用 laypage.render 方法就会触发 jump 回调
+      // 1. 点击页码
+      // 2. 调用 laypage.render 方法就会触发 jump 回调
       jump: function (obj, first) {
         q.pagenum = obj.curr;
         q.pagesize = obj.limit;
@@ -107,9 +107,34 @@ $(function () {
           initTable();
         }
       },
-      layout: ['count', 'limit', 'prev', 'page', 'next', 'skip']
+      layout: ["count", "limit", "prev", "page", "next", "skip"],
     });
   }
 
-  
+  $("tbody").on("click", "#btn-delete", function () {
+    let len = $("#btn-delete").length;
+    let id = $(this).attr("data-id");
+    layer.confirm(
+      "确定删除该文章?",
+      { icon: 3, title: "提示" },
+      function (index) {
+        $.ajax({
+          method: "GET",
+          url: "/my/article/delete/" + id,
+          success: function (res) {
+            if (res.status !== 0) {
+              return layer.msg("删除文章失败!");
+            }
+            layer.msg("删除文章成功!");
+            layer.close(index);
+            // 注意删除文章后，判断该页是否还存在数据，不存在，pagenum - 1
+            if (len === 1) {
+              q.pagenum = q.pagenum === 1 ? 1 : q.pagenum - 1;
+            }
+            initTable();
+          },
+        });
+      }
+    );
+  });
 });
