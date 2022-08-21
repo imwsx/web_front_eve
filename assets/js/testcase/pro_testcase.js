@@ -1,34 +1,34 @@
 $(function () {
+  // tinymce.init({
+  //   selector: "#content2",
+  //   language: "zh-Hans",
+  // });
+  // tinymce.init({
+  //   selector: "#content3",
+  //   language: "zh-Hans",
+  // });
+
   var layer = layui.layer;
   var form = layui.form;
   var table = layui.table;
+  var dropdown = layui.dropdown;
+  var laydate = layui.laydate;
 
   initProCateList();
 
   function initProCateList() {
     layui.use(["table", "dropdown"], function () {
-      var table = layui.table;
-      var dropdown = layui.dropdown;
-      layer.msg(
-        "本示例演示的数据为静态模拟数据，<br>实际使用时换成您的真实接口即可。",
-        {
-          closeBtn: 1,
-          icon: 6,
-          time: 21 * 1000,
-          offset: "21px",
-        }
-      );
-
       // 创建渲染实例
       table.render({
         elem: "#test",
-        url: "/my/pro/cates",
+        id: "idTest",
+        url: "/my/testcase/tcs",
         parseData: function (res) {
-          //res 即为原始返回的数据
           return {
-            code: res.status, //解析接口状态
-            msg: res.message, //解析提示文本
-            data: res.data, //解析数据列表
+            code: res.status,
+            msg: res.message,
+            data: res.data,
+            count: res.total,
           };
         },
         toolbar: "#toolbarDemo",
@@ -38,67 +38,89 @@ $(function () {
           "print",
           {
             title: "帮助",
-            layEvent: "LAYTABLE_TIPS",
+            layEvent: "help",
             icon: "layui-icon-tips",
           },
         ],
+        title: "上位机软件测试用例" + dayjs(new Date()).format("YYYY-MM-DD"),
         height: "full-200", // 最大高度减去其他容器已占有的高度差
         cellMinWidth: 80,
-        totalRow: true, // 开启合计行
-        page: true,
+        page: {
+          layout: ["count", "limit", "prev", "page", "next", "skip"],
+          limits: [2, 3, 5, 10],
+          groups: 1, //只显示 1 个连续页码
+          first: false, //不显示首页
+          last: false, //不显示尾页
+        },
         cols: [
           [
             { type: "checkbox", fixed: "left" },
             {
               field: "id",
-              fixed: "left",
-              width: 80,
               title: "ID",
+              width: 80,
+              // width: 80,
+              fixed: "left",
               sort: true,
-              totalRowText: "合计：",
+              align: "center",
             },
             {
-              field: "pro_model",
-              title: "产品型号",
+              field: "tc_title",
+              title: "用例标题",
+              // width: 180,
               edit: "textarea",
-              width: 160,
+              align: "center",
             },
             {
-              field: "pro_name",
-              title: "产品名称",
+              field: "tc_pre",
+              title: "前提条件",
+              // width: 260,
+              // minWidth: 160,
               edit: "textarea",
-              width: 160,
-              minWidth: 160,
               style: "-moz-box-align: start;",
             },
-            { field: "status", width: 100, title: "在研状态" },
-            { field: "joinTime", title: "最后编辑时间", width: 120 },
+            {
+              field: "tc_step",
+              title: "执行步骤",
+              // width: 260,
+              edit: "textarea",
+            },
+            {
+              field: "tc_exp",
+              title: "预期结果",
+              // width: 260,
+              edit: "textarea",
+            },
             {
               fixed: "right",
               title: "操作",
-              width: 150,
-              minWidth: 150,
+              // width: 180,
+              // minWidth: 180,
+              align: "center",
               toolbar: "#barDemo",
             },
           ],
         ],
+        text: {
+          none: "暂无相关数据",
+        },
         done: function () {
           var id = this.id;
-          // 更多测试
           dropdown.render({
-            elem: "#moreTest", //可绑定在任意元素中，此处以上述按钮为例
+            elem: "#moreTest",
             data: [
               {
-                id: "add",
-                title: "添加",
+                id: "isAll",
+                title: "是否全选",
+              },
+              { type: "-" },
+              {
+                id: "getCheckData",
+                title: "获取选中行数据",
               },
               {
-                id: "update",
-                title: "编辑",
-              },
-              {
-                id: "delete",
-                title: "删除",
+                id: "getData",
+                title: "获取当前页数据",
               },
             ],
             //菜单被点击的事件
@@ -106,28 +128,16 @@ $(function () {
               var checkStatus = table.checkStatus(id);
               var data = checkStatus.data; // 获取选中的数据
               switch (obj.id) {
-                case "add":
-                  layer.open({
-                    title: "添加",
-                    type: 1,
-                    area: ["80%", "80%"],
-                    content: '<div style="padding: 16px;">自定义表单元素</div>',
-                  });
+                case "isAll":
+                  layer.msg(checkStatus.isAll ? "全选" : "未全选");
                   break;
-                case "update":
+                case "getCheckData":
                   if (data.length !== 1) return layer.msg("请选择一行");
-                  layer.open({
-                    title: "编辑",
-                    type: 1,
-                    area: ["80%", "80%"],
-                    content: '<div style="padding: 16px;">自定义表单元素</div>',
-                  });
+                  layer.alert(layui.util.escape(JSON.stringify(data)));
                   break;
-                case "delete":
-                  if (data.length === 0) {
-                    return layer.msg("请选择一行");
-                  }
-                  layer.msg("delete event");
+                case "getData":
+                  var getData = table.getData(id);
+                  layer.alert(layui.util.escape(JSON.stringify(getData)));
                   break;
               }
             },
@@ -140,36 +150,34 @@ $(function () {
 
       // 工具栏事件
       table.on("toolbar(test)", function (obj) {
-        var id = obj.config.id;
-        var checkStatus = table.checkStatus(id);
-        var othis = lay(this);
         switch (obj.event) {
-          case "getCheckData":
-            var data = checkStatus.data;
-            layer.alert(layui.util.escape(JSON.stringify(data)));
+          case "addData":
+            layer.open({
+              title: "编辑",
+              type: 1,
+              area: ["60%", "80%"],
+              content: $("#tc-add"),
+            });
             break;
-          case "getData":
-            var getData = table.getData(id);
-            console.log(getData);
-            layer.alert(layui.util.escape(JSON.stringify(getData)));
-            break;
-          case "isAll":
-            layer.msg(checkStatus.isAll ? "全选" : "未全选");
+          case "deleteAll":
+            layer.confirm("确定删除选中产品吗？", function (index) {
+              obj.del();
+              layer.close(index);
+            });
             break;
           case "multi-row":
-            table.reload("test", {
-              // 设置行样式，此处以设置多行高度为例。若为单行，则没必要设置改参数 - 注：v2.7.0 新增
+            table.reload("idTest", {
               lineStyle: "height: 95px;",
             });
-            layer.msg("即通过设置 lineStyle 参数可开启多行");
+            layer.msg("已设为多行");
             break;
           case "default-row":
-            table.reload("test", {
+            table.reload("idTest", {
               lineStyle: null, // 恢复单行
             });
             layer.msg("已设为单行");
             break;
-          case "LAYTABLE_TIPS":
+          case "help":
             layer.alert("有事请找 wsx");
             break;
         }
@@ -177,11 +185,10 @@ $(function () {
 
       //触发单元格工具事件
       table.on("tool(test)", function (obj) {
-        // 双击 toolDouble
-        var data = obj.data;
-        //console.log(obj)
+        var checkStatus = table.checkStatus("idTest");
         if (obj.event === "del") {
-          layer.confirm("真的删除行么", function (index) {
+          if (checkStatus.data.length !== 1) return layer.msg("请选择一行");
+          layer.confirm("确定删除该产品吗？", function (index) {
             obj.del();
             layer.close(index);
           });
@@ -189,31 +196,47 @@ $(function () {
           layer.open({
             title: "编辑",
             type: 1,
-            area: ["80%", "80%"],
-            content: '<div style="padding: 16px;">自定义表单元素</div>',
+            area: ["26%", "50%"],
+            content: $("#form-edit"),
+            success: function () {
+              $("#form-edit input:first").attr("value", obj.data.id);
+              form.val("form-edit", {
+                pro_model: obj.data.pro_model,
+                pro_name: obj.data.pro_name,
+                pro_status: statusToNum(obj.data.pro_status),
+                edittime: dayjs(new Date()).format("YYYY-MM-DD HH:mm:ss"),
+              });
+            },
           });
         }
       });
 
       //触发表格复选框选择
-      table.on("checkbox(test)", function (obj) {
-        console.log(obj);
-      });
+      table.on("checkbox(test)", function (obj) {});
 
       //触发表格单选框选择
-      table.on("radio(test)", function (obj) {
-        console.log(obj);
-      });
+      table.on("radio(test)", function (obj) {});
 
       // 行单击事件
       table.on("row(test)", function (obj) {
-        //console.log(obj);
-        //layer.closeAll('tips');
+        // var data = obj.data;
+        // layer.prompt(
+        //   {
+        //     formType: 2,
+        //     title: "修改型号： [" + data.pro_model + "] 的 ",
+        //     value: data.sign,
+        //   },
+        //   function (value, index) {
+        //     layer.close(index);
+        //     // 发送Ajax请求
+        //     obj.update({
+        //       sign: value,
+        //     });
+        //   }
+        // );
       });
       // 行双击事件
-      table.on("rowDouble(test)", function (obj) {
-        console.log(obj);
-      });
+      table.on("rowDouble(test)", function (obj) {});
 
       // 单元格编辑事件
       table.on("edit(test)", function (obj) {
@@ -227,4 +250,87 @@ $(function () {
       });
     });
   }
+
+  layui.use("laydate", function () {
+    laydate.render({
+      elem: "#editTime",
+      type: "datetime",
+      format: "yyyy-MM-dd HH:mm:ss",
+      isInitValue: true,
+      value: new Date(),
+    });
+  });
+
+  $("html").on("submit", "#form-add", function (e) {
+    e.preventDefault();
+
+    $.ajax({
+      method: "POST",
+      url: "/my/pro/addcate",
+      data: $(this).serialize(),
+      success: function (res) {
+        if (res.status !== 0) {
+          return layer.msg("新增产品类别失败!");
+        } else {
+          layer.msg("新增产品类别成功!");
+          initProCateList();
+        }
+      },
+    });
+  });
+
+  $("html").on("submit", "#form-edit", function (e) {
+    e.preventDefault();
+
+    $.ajax({
+      method: "POST",
+      url: "/my/pro/updatecate",
+      data: $(this).serialize(),
+      success: function (res) {
+        if (res.status !== 0) {
+          return layer.msg("新增产品类别失败!");
+        } else {
+          layer.msg("新增产品类别成功!");
+          initProCateList();
+        }
+      },
+    });
+  });
+
+  function resFormat(res) {
+    for (let i = 0; i < res.data.length; i++) {
+      res.data[i].pro_status = statusToText(res.data[i].pro_status);
+    }
+  }
+
+  function statusToText(key) {
+    switch (key) {
+      case 0:
+        return "在研";
+      case 1:
+        return "验证";
+      case 2:
+        return "转产";
+      case 3:
+        return "在售";
+    }
+  }
+
+  function statusToNum(key) {
+    switch (key) {
+      case "在研":
+        return 0;
+      case "验证":
+        return 1;
+      case "转产":
+        return 2;
+      case "在售":
+        return 3;
+    }
+  }
+
+  tinymce.init({
+    selector: "#content",
+    language: "zh-Hans",
+  });
 });

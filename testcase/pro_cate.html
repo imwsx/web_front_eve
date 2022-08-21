@@ -7,190 +7,194 @@
     <title>Document</title>
     <link rel="stylesheet" href="../assets/lib/layui/css/layui.css" />
     <link rel="stylesheet" href="../assets/css/base.css" />
-    <link rel="stylesheet" href="../assets/css/testcase/pro_testcase.css" />
+    <link rel="stylesheet" href="../assets/css/testcase/pro_cate.css" />
   </head>
   <body>
     <div class="layui-card">
       <div class="layui-card-header">
         产品管理
-        <button
-          type="button"
-          class="layui-btn layui-btn-normal"
-          id="btnAddCate"
-        >
-          添加产品
-        </button>
       </div>
       <div class="layui-card-body">
-        <table class="layui-table">
-          <colgroup>
-            <col />
-            <col />
-            <col width="300" />
-          </colgroup>
-          <thead>
-            <tr>
-              <th>产品型号</th>
-              <th>产品名称</th>
-              <th>在研状态</th>
-              <th>操作</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
+        <!-- <div class="demoTable">
+          搜索产品：
+          <div class="layui-inline">
+            <input class="layui-input" name="id" id="demoReload" autocomplete="off">
+          </div>
+          <button class="layui-btn" data-type="reload">搜索</button>
+        </div> -->
+        <table class="layui-hide" id="test" lay-data="{id: 'idTest'}" lay-filter="test"></table>
+ 
+        <script type="text/html" id="toolbarDemo">
+          <div class="layui-btn-container">
+            <button class="layui-btn layui-btn-sm" lay-event="addData">添加产品</button>
+            <button class="layui-btn layui-btn-sm layui-btn-danger" lay-event="deleteAll">批量删除</button>
+            <button class="layui-btn layui-btn-sm layui-btn-primary" lay-event="default-row">
+              单行
+            </button>
+            <button class="layui-btn layui-btn-sm layui-btn-primary" lay-event="multi-row">
+              多行
+            </button>
+            <button class="layui-btn layui-btn-sm" id="moreTest">
+              更多测试
+              <i class="layui-icon layui-icon-down layui-font-12"></i>
+            </button>
+          </div>
+        </script>
+
+        <!-- <script type="text/html" id="statusTpl">
+          <select name="pro_status" id="demoStatus" class="layui-border" lay-ignore>
+          <option value="0">在研</option>
+          <option value="1">验证</option>
+          <option value="2">转产</option>
+          <option value="3">在售</option>
+          </select>
+        </script> -->
+         
+        <script type="text/html" id="barDemo">
+          <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+          <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+        </script>
+        
+        <script type="text/html" id="pageDemo">
+          <div id="page"></div>
+        </script> 
+    </div>
+
+    <script src="../assets/lib/jquery-3.6.0.js"></script>
+    <script src="../assets/lib/dayjs.min.js"></script>
+    <script src="../assets/lib/layui/layui.js"></script>
+    <!-- <script src="../assets/lib/template-web.js"></script> -->
+
+    <script src="../assets/js/baseAPI.js"></script>
+    <script src="../assets/js/testcase/pro_cate.js"></script>
+  </body>
+
+  <form class="layui-form" id="form-add" style="display: none;">
+    <div class="layui-form-item">
+      <label class="layui-form-label">产品型号</label>
+      <div class="layui-input-block">
+        <input
+          type="text"
+          name="pro_model"
+          required
+          lay-verify="required"
+          placeholder="请输入产品型号"
+          autocomplete="off"
+          class="layui-input"
+        />
+      </div>
+    </div>
+    <div class="layui-form-item">
+      <label class="layui-form-label">产品名称</label>
+      <div class="layui-input-block">
+        <input
+          type="text"
+          name="pro_name"
+          required
+          lay-verify="required"
+          placeholder="请输入产品名称"
+          autocomplete="off"
+          class="layui-input"
+        />
       </div>
     </div>
 
-    <script type="text/html" id="tpl-table">
-      {{each data}}
-      <tr>
-        <td>{{$value.pro_model}}</td>
-        <td>{{$value.pro_name}}</td>
-        <td>{{$value.status}}</td>
-        <td>
-          <button
-            type="button"
-            class="layui-btn layui-btn-xs"
-            id="btn-edit"
-            data-id="{{$value.id}}"
-          >
-            编辑
-          </button>
-          <button
-            type="button"
-            class="layui-btn layui-btn-danger layui-btn-xs"
-            id="btn-delete"
-            data-id="{{$value.id}}"
-          >
-            删除
-          </button>
-        </td>
-      </tr>
-      {{/each}}
-    </script>
+    <div class="layui-form-item">
+      <label class="layui-form-label">产品状态</label>
+      <div class="layui-input-block">
+        <select name="pro_status" lay-verify="">
+          <option value="">请选择产品状态</option>
+          <option value="0">在研</option>
+          <option value="1">验证</option>
+          <option value="2">转产</option>
+          <option value="3">在售</option>
+        </select>
+      </div>
+    </div>
 
-    <script type="text/html" id="dialog-add">
-      <form class="layui-form" id="form-add">
-        <div class="layui-form-item">
-          <label class="layui-form-label">产品型号</label>
-          <div class="layui-input-block">
-            <input
-              type="text"
-              name="pro_model"
-              required
-              lay-verify="required"
-              placeholder="请输入产品型号"
-              autocomplete="off"
-              class="layui-input"
-            />
-          </div>
+    <div class="layui-form-item">
+      <div class="layui-inline">
+        <label class="layui-form-label">编辑时间</label>
+        <div class="layui-input-inline">
+          <input type="text" class="layui-input" id="editTime" name="edittime" placeholder="yyyy-MM-dd HH:mm:ss" autocomplete="off">
         </div>
-        <div class="layui-form-item">
-          <label class="layui-form-label">产品名称</label>
-          <div class="layui-input-block">
-            <input
-              type="text"
-              name="pro_name"
-              required
-              lay-verify="required"
-              placeholder="请输入产品名称"
-              autocomplete="off"
-              class="layui-input"
-            />
-          </div>
-        </div>
-        <div class="layui-form-item">
-          <label class="layui-form-label">在研状态</label>
-          <div class="layui-input-block">
-            <input
-              type="text"
-              name="status"
-              required
-              lay-verify="required"
-              placeholder="请输入在研状态"
-              autocomplete="off"
-              class="layui-input"
-            />
-          </div>
-        </div>
-        <div class="layui-form-item">
-          <div class="layui-input-block">
-            <button class="layui-btn" lay-submit lay-filter="formDemo">
-              确认添加
-            </button>
-            <button type="reset" class="layui-btn layui-btn-primary">
-              重置
-            </button>
-          </div>
-        </div>
-      </form>
-    </script>
+      </div>
+    </div>
 
-    <script type="text/html" id="dialog-edit">
-      <form class="layui-form" id="form-edit" lay-filter="form-edit">
-        <!-- 添加隐藏域，为 form 表单添加 id  -->
-        <input type="hidden" name="id" />
-        <div class="layui-form-item">
-          <label class="layui-form-label">产品型号</label>
-          <div class="layui-input-block">
-            <input
-              type="text"
-              name="pro_model"
-              required
-              lay-verify="required"
-              placeholder="请输入产品型号"
-              autocomplete="off"
-              class="layui-input"
-            />
-          </div>
-        </div>
-        <div class="layui-form-item">
-          <label class="layui-form-label">产品名称</label>
-          <div class="layui-input-block">
-            <input
-              type="text"
-              name="pro_name"
-              required
-              lay-verify="required"
-              placeholder="请输入产品名称"
-              autocomplete="off"
-              class="layui-input"
-            />
-          </div>
-        </div>
-        <div class="layui-form-item">
-          <label class="layui-form-label">在研状态</label>
-          <div class="layui-input-block">
-            <input
-              type="text"
-              name="status"
-              required
-              lay-verify="required"
-              placeholder="请输入在研状态"
-              autocomplete="off"
-              class="layui-input"
-            />
-          </div>
-        </div>
+    <div class="layui-form-item">
+      <div class="layui-input-block">
+        <button class="layui-btn" lay-submit lay-filter="formDemo">
+          确认修改
+        </button>
+        <button type="reset" class="layui-btn layui-btn-primary">
+          重置
+        </button>
+      </div>
+    </div>
+  </form>
 
-        <div class="layui-form-item">
-          <div class="layui-input-block">
-            <button class="layui-btn" lay-submit lay-filter="formDemo">
-              确认修改
-            </button>
-            <button type="reset" class="layui-btn layui-btn-primary">
-              重置
-            </button>
-          </div>
+  <form class="layui-form" id="form-edit" lay-filter="form-edit" style="display: none;">
+    <input type="hidden" name="id">
+    <div class="layui-form-item">
+      <label class="layui-form-label">产品型号</label>
+      <div class="layui-input-block">
+        <input
+          type="text"
+          name="pro_model"
+          required
+          lay-verify="required"
+          placeholder="请输入产品型号"
+          autocomplete="off"
+          class="layui-input"
+        />
+      </div>
+    </div>
+    <div class="layui-form-item">
+      <label class="layui-form-label">产品名称</label>
+      <div class="layui-input-block">
+        <input
+          type="text"
+          name="pro_name"
+          required
+          lay-verify="required"
+          placeholder="请输入产品名称"
+          autocomplete="off"
+          class="layui-input"
+        />
+      </div>
+    </div>
+
+    <div class="layui-form-item">
+      <label class="layui-form-label">产品状态</label>
+      <div class="layui-input-block">
+        <select name="pro_status" lay-verify="">
+          <option value="">请选择产品状态</option>
+          <option value="0">在研</option>
+          <option value="1">验证</option>
+          <option value="2">转产</option>
+          <option value="3">在售</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="layui-form-item">
+      <div class="layui-inline">
+        <label class="layui-form-label">编辑时间</label>
+        <div class="layui-input-inline">
+          <input type="text" class="layui-input" id="editTime" name="edittime" placeholder="yyyy-MM-dd HH:mm:ss" autocomplete="off">
         </div>
-      </form>
-    </script>
+      </div>
+    </div>
 
-    <script src="../assets/lib/jquery-3.6.0.js"></script>
-    <script src="../assets/lib/layui/layui.js"></script>
-    <script src="../assets/lib/template-web.js"></script>
-
-    <script src="../assets/js/baseAPI.js"></script>
-    <script src="../assets/js/testcase/pro_testcase.js"></script>
-  </body>
+    <div class="layui-form-item">
+      <div class="layui-input-block">
+        <button class="layui-btn" lay-submit lay-filter="formDemo">
+          确认修改
+        </button>
+        <button type="reset" class="layui-btn layui-btn-primary">
+          重置
+        </button>
+      </div>
+    </div>
+  </form>
 </html>

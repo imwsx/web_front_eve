@@ -2092,7 +2092,7 @@ body.tox-dialog__disable-scroll {
   display: inline-block;
   overflow: hidden;
   vertical-align: top;
-  z-index: 1150;
+  z-index: 9999999999999;
 }
 .tox .tox-menu.tox-collection.tox-collection--list {
   padding: 0 4px;
