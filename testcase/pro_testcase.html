@@ -1,30 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
-    <link rel="stylesheet" href="../assets/lib/layui/css/layui.css" />
-    <link rel="stylesheet" href="../assets/css/base.css" />
-    <link rel="stylesheet" href="../assets/css/testcase/pro_testcase.css" />
-  </head>
-  <body>
-    <div class="layui-card">
-      <div class="layui-card-header">
-        用例管理
-      </div>
-      <div class="layui-card-body">
-        <!-- <div class="demoTable">
-          搜索ID：
-          <div class="layui-inline">
-            <input class="layui-input" name="id" id="demoReload" autocomplete="off">
-          </div>
-          <button class="layui-btn" data-type="reload">搜索</button>
-        </div> -->
-        <table class="layui-hide" id="test" lay-data="{id: 'idTest'}" lay-filter="test"></table>
- 
-        <script type="text/html" id="toolbarDemo">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Document</title>
+  <link rel="stylesheet" href="../assets/lib/layui/css/layui.css" />
+  <link rel="stylesheet" href="../assets/css/base.css" />
+  <link rel="stylesheet" href="../assets/css/testcase/pro_tc.css" />
+</head>
+
+<body>
+  <div class="layui-card">
+    <div class="layui-card-header">
+      用例管理
+    </div>
+    <div class="layui-card-body">
+      <table class="layui-hide" id="test" lay-data="{id: 'idTest'}" lay-filter="test"></table>
+
+      <script type="text/html" id="toolbarDemo">
           <div class="layui-btn-container">
             <button class="layui-btn layui-btn-sm" lay-event="addData">添加用例</button>
             <button class="layui-btn layui-btn-sm layui-btn-danger" lay-event="deleteAll">批量删除</button>
@@ -40,14 +35,29 @@
             </button>
           </div>
         </script>
-         
-        <script type="text/html" id="barDemo">
+      <script type="text/html" id="barDemo">
+          <a class="layui-btn layui-btn-xs" lay-event="save">保存</a>
           <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
           <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+      </script>
+
+      <script type="text/html" id="pageDemo">
+        <div id="page"></div>
+      </script>
+
+      <script type="text/html" id="radioTpl">
+        <form>
+          <div class="layui-form">
+          <input type="radio" class="tc_status" name="tc_status" value="1" title="pass" lay-filter="statusDis" {{ d.tc_status === '1' ? 'checked' : '' }}>
+          <input type="radio" class="tc_status" name="tc_status" value="2" title="false" lay-filter="statusDis" {{ d.tc_status === '2' ? 'checked' : '' }}>
+          <input type="radio" class="tc_status" name="tc_status" value="3" title="block" lay-filter="statusDis" {{ d.tc_status === '3' ? 'checked' : '' }}>
+          <input type="radio" class="tc_status" name="tc_status" value="4" title="NaN" lay-filter="statusDis" {{ d.tc_status === '4' ? 'checked' : '' }}>
+      </div>
+    </form>    
         </script>
-        
-        <script type="text/html" id="pageDemo">
-          <div id="page"></div>
+
+      <script type="text/html" id="checkboxTpl">
+          <input type="checkbox" name="is_lock" value="{{d.is_lock}}" title="启用" lay-filter="lockDis" {{ d.is_lock == 1 ? 'checked' : ' ' }}>
         </script>
     </div>
 
@@ -55,129 +65,154 @@
     <script src="../assets/lib/tinymce/tinymce.min.js"></script>
     <script src="../assets/lib/dayjs.min.js"></script>
     <script src="../assets/lib/layui/layui.js"></script>
-    
+
     <script src="../assets/js/baseAPI.js"></script>
-    <script src="../assets/js/testcase/pro_testcase.js"></script>
-  </body>
+    <script src="../assets/js/testcase/pro_tc.js"></script>
+</body>
 
-  <form class="layui-form" id="tc-add" lay-filter="tc-add" style="display: none;">
-    <div class="layui-form-item">
-      <label class="layui-form-label">用例标题</label>
-      <div class="layui-input-block">
-        <input
-          type="text"
-          name="tc_title"
-          required
-          lay-verify="required"
-          placeholder="请输入用例标题"
-          autocomplete="off"
-          class="layui-input"
-        />
+<form class="layui-form" id="tc-add" lay-filter="tc-add" style="display: none;">
+  <div class="layui-form-item">
+    <label class="layui-form-label"><span class="imp">*</span>用例模块</label>
+    <div class="layui-input-block">
+      <input type="text" name="tc_module" required lay-verify="required" placeholder="请输入用例模块" autocomplete="off"
+        class="layui-input" />
+    </div>
+  </div>
+  <div class="layui-form-item">
+    <label class="layui-form-label"><span class="imp">*</span>用例标题</label>
+    <div class="layui-input-block">
+      <input type="text" name="tc_title" required lay-verify="required" placeholder="请输入用例标题" autocomplete="off"
+        class="layui-input" />
+    </div>
+  </div>
+  <div class="layui-form-item">
+    <label class="layui-form-label">前提条件</label>
+    <div class="layui-input-block">
+      <textarea name="tc_pre" placeholder="请输入前提条件" class="layui-textarea"></textarea>
+    </div>
+  </div>
+  <div class="layui-form-item">
+    <label class="layui-form-label"><span class="imp">*</span>执行步骤</label>
+    <div class="layui-input-block">
+      <textarea name="tc_step" placeholder="请输入执行步骤" class="layui-textarea"></textarea>
+    </div>
+  </div>
+  <div class="layui-form-item">
+    <label class="layui-form-label"><span class="imp">*</span>预期结果</label>
+    <div class="layui-input-block">
+      <textarea name="tc_exp" placeholder="请输入预期结果" class="layui-textarea"></textarea>
+    </div>
+  </div>
+  <div class="layui-form-item">
+    <label class="layui-form-label">备注</label>
+    <div class="layui-input-block">
+      <input type="text" name="tc_remark" required lay-verify="required" placeholder="请输入备注信息" autocomplete="off"
+        class="layui-input" />
+    </div>
+  </div>
+  <div class="layui-form-item">
+    <label class="layui-form-label"><span class="imp">*</span>优先级</label>
+    <div class="layui-input-inline">
+      <select name="tc_pr" lay-verify="">
+        <option value="">请选择用例优先级</option>
+        <option value="0">高</option>
+        <option value="1">中</option>
+        <option value="2">低</option>
+      </select>
+    </div>
+  </div>
+  <div class="layui-form-item">
+    <div class="layui-inline">
+      <label class="layui-form-label">编辑时间</label>
+      <div class="layui-input-inline">
+        <input type="text" class="layui-input" id="editTime" name="edittime" placeholder="yyyy-MM-dd HH:mm:ss"
+          autocomplete="off">
       </div>
     </div>
-    <div class="layui-form-item">
-      <label class="layui-form-label">前提条件</label>
-      <div class="layui-input-block">
-        <textarea name="content" id="content"></textarea>
-      </div>
+  </div>
+  <div class="layui-form-item">
+    <div class="layui-input-block">
+      <button class="layui-btn" lay-submit lay-filter="formDemo">
+        立即发布
+      </button>
+      <button type="reset" class="layui-btn layui-btn-primary">
+        重置
+      </button>
     </div>
-    <!-- <div class="layui-form-item">
-      <label class="layui-form-label">执行步骤</label>
-      <div class="layui-input-block">
-        <textarea name="content2" id="content2"></textarea>
-      </div>
-    </div>
-    <div class="layui-form-item">
-      <label class="layui-form-label">预期结果</label>
-      <div class="layui-input-block">
-        <textarea name="content3" id="content3"></textarea>
-      </div>
-    </div> -->
+  </div>
+</form>
 
-    <div class="layui-form-item">
-      <div class="layui-inline">
-        <label class="layui-form-label">编辑时间</label>
-        <div class="layui-input-inline">
-          <input type="text" class="layui-input" id="editTime" name="edittime" placeholder="yyyy-MM-dd HH:mm:ss" autocomplete="off">
-        </div>
+<form class="layui-form" id="tc-edit" lay-filter="tc-edit" style="display: none;">
+  <input type="hidden" name="id">
+  <div class="layui-form-item">
+    <label class="layui-form-label"><span class="imp">*</span>用例模块</label>
+    <div class="layui-input-block">
+      <input type="text" name="tc_module" required lay-verify="required" placeholder="请输入用例模块" autocomplete="off"
+        class="layui-input" />
+    </div>
+  </div>
+  <div class="layui-form-item">
+    <label class="layui-form-label"><span class="imp">*</span>用例标题</label>
+    <div class="layui-input-block">
+      <input type="text" name="tc_title" required lay-verify="required" placeholder="请输入用例标题" autocomplete="off"
+        class="layui-input" />
+    </div>
+  </div>
+  <div class="layui-form-item">
+    <label class="layui-form-label">前提条件</label>
+    <div class="layui-input-block">
+      <textarea name="tc_pre" placeholder="请输入前提条件" class="layui-textarea"></textarea>
+    </div>
+  </div>
+  <div class="layui-form-item">
+    <label class="layui-form-label"><span class="imp">*</span>执行步骤</label>
+    <div class="layui-input-block">
+      <textarea name="tc_step" placeholder="请输入执行步骤" class="layui-textarea"></textarea>
+    </div>
+  </div>
+  <div class="layui-form-item">
+    <label class="layui-form-label"><span class="imp">*</span>预期结果</label>
+    <div class="layui-input-block">
+      <textarea name="tc_exp" placeholder="请输入预期结果" class="layui-textarea"></textarea>
+    </div>
+  </div>
+  <div class="layui-form-item">
+    <label class="layui-form-label">备注</label>
+    <div class="layui-input-block">
+      <input type="text" name="tc_remark" required lay-verify="required" placeholder="请输入备注信息" autocomplete="off"
+        class="layui-input" />
+    </div>
+  </div>
+  <div class="layui-form-item">
+    <label class="layui-form-label"><span class="imp">*</span>优先级</label>
+    <div class="layui-input-inline">
+      <select name="tc_pr" lay-verify="">
+        <option value="">请选择用例优先级</option>
+        <option value="0">高</option>
+        <option value="1">中</option>
+        <option value="2">低</option>
+      </select>
+    </div>
+  </div>
+  <div class="layui-form-item">
+    <div class="layui-inline">
+      <label class="layui-form-label">编辑时间</label>
+      <div class="layui-input-inline">
+        <input type="text" class="layui-input" id="editTime" name="edittime" placeholder="yyyy-MM-dd HH:mm:ss"
+          autocomplete="off">
       </div>
     </div>
+  </div>
+  <div class="layui-form-item">
+    <div class="layui-input-block">
+      <button class="layui-btn" lay-submit lay-filter="formDemo">
+        立即发布
+      </button>
+      <button type="reset" class="layui-btn layui-btn-primary">
+        重置
+      </button>
+    </div>
+  </div>
+</form>
 
-    <div class="layui-form-item">
-      <div class="layui-input-block">
-        <button class="layui-btn" lay-submit lay-filter="formDemo">
-          立即发布
-        </button>
-        <button type="reset" class="layui-btn layui-btn-primary">
-          重置
-        </button>
-      </div>
-    </div>
-  </form>
-
-
-  <form class="layui-form" id="form-edit" lay-filter="form-edit" style="display: none;">
-    <input type="hidden" name="id">
-    <div class="layui-form-item">
-      <label class="layui-form-label">产品型号</label>
-      <div class="layui-input-block">
-        <input
-          type="text"
-          name="pro_model"
-          required
-          lay-verify="required"
-          placeholder="请输入产品型号"
-          autocomplete="off"
-          class="layui-input"
-        />
-      </div>
-    </div>
-    <div class="layui-form-item">
-      <label class="layui-form-label">产品名称</label>
-      <div class="layui-input-block">
-        <input
-          type="text"
-          name="pro_name"
-          required
-          lay-verify="required"
-          placeholder="请输入产品名称"
-          autocomplete="off"
-          class="layui-input"
-        />
-      </div>
-    </div>
-
-    <div class="layui-form-item">
-      <label class="layui-form-label">产品状态</label>
-      <div class="layui-input-block">
-        <select name="pro_status" lay-verify="">
-          <option value="">请选择产品状态</option>
-          <option value="0">在研</option>
-          <option value="1">验证</option>
-          <option value="2">转产</option>
-          <option value="3">在售</option>
-        </select>
-      </div>
-    </div>
-
-    <div class="layui-form-item">
-      <div class="layui-inline">
-        <label class="layui-form-label">编辑时间</label>
-        <div class="layui-input-inline">
-          <input type="text" class="layui-input" id="editTime" name="edittime" placeholder="yyyy-MM-dd HH:mm:ss" autocomplete="off">
-        </div>
-      </div>
-    </div>
-
-    <div class="layui-form-item">
-      <div class="layui-input-block">
-        <button class="layui-btn" lay-submit lay-filter="formDemo">
-          确认修改
-        </button>
-        <button type="reset" class="layui-btn layui-btn-primary">
-          重置
-        </button>
-      </div>
-    </div>
-  </form>
 </html>
