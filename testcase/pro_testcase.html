@@ -1,218 +1,311 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-  <meta charset="UTF-8" />
-  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Document</title>
-  <link rel="stylesheet" href="../assets/lib/layui/css/layui.css" />
-  <link rel="stylesheet" href="../assets/css/base.css" />
-  <link rel="stylesheet" href="../assets/css/testcase/pro_tc.css" />
-</head>
-
-<body>
-  <div class="layui-card">
-    <div class="layui-card-header">
-      用例管理
-    </div>
+  <head>
+    <meta charset="UTF-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>testcase</title>
+    <link rel="stylesheet" href="../assets/lib/layui/css/layui.css"/>
+    <link rel="stylesheet" href="../assets/css/base.css"/>
+    <link rel="stylesheet" href="../assets/css/testcase/pro_tc.css"/>
+  </head>
+  <body><div class="layui-card">
+    <div class="layui-card-header">用例管理</div>
     <div class="layui-card-body">
-      <table class="layui-hide" id="test" lay-data="{id: 'idTest'}" lay-filter="test"></table>
-
+      <table class="layui-hide" id="test" lay-data="{ id:'idTest' }" lay-filter="test"></table>
+      
       <script type="text/html" id="toolbarDemo">
-          <div class="layui-btn-container">
-            <button class="layui-btn layui-btn-sm" lay-event="addData">添加用例</button>
-            <button class="layui-btn layui-btn-sm layui-btn-danger" lay-event="deleteAll">批量删除</button>
-            <button class="layui-btn layui-btn-sm layui-btn-primary" lay-event="default-row">
-              单行
-            </button>
-            <button class="layui-btn layui-btn-sm layui-btn-primary" lay-event="multi-row">
-              多行
-            </button>
-            <button class="layui-btn layui-btn-sm" id="moreTest">
-              更多测试 
-              <i class="layui-icon layui-icon-down layui-font-12"></i>
-            </button>
-          </div>
-        </script>
-      <script type="text/html" id="barDemo">
-          <a class="layui-btn layui-btn-xs" lay-event="save">保存</a>
-          <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
-          <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+        <div class="layui-btn-container">
+          <button class="layui-btn layui-btn-sm" lay-event="addData">添加用例</button>
+          <button class="layui-btn layui-btn-sm" lay-event="saveAll">批量保存</button>
+          <button class="layui-btn layui-btn-sm layui-btn-danger" lay-event="deleteAll">批量删除</button>
+          <button class="layui-btn layui-btn-sm layui-btn-primary" lay-event="default-row">单行</button>
+          <button class="layui-btn layui-btn-sm layui-btn-primary" lay-event="multi-row">多行</button>
+          <button class="layui-btn layui-btn-sm" id="moreTest">
+            更多测试
+            <i class="layui-icon layui-icon-down layui-font-12"></i>
+          </button>
+          <button class="layui-btn layui-btn-sm layui-btn-normal" lay-event="report">
+            迭代报告
+            <i class="layui-icon layui-icon-form layui-font-12"></i>
+          </button>
+        </div>
       </script>
-
+      
+      <script type="text/html" id="barDemo">
+        <button type="button" class="layui-btn layui-btn-xs" lay-event="save">
+          <i class="layui-icon">&#xe605;</i>
+        </button>
+        <button type="button" class="layui-btn layui-btn-xs" lay-event="edit">
+          <i class="layui-icon">&#xe642;</i>
+        </button>
+        <button type="button" class="layui-btn layui-btn-xs layui-btn-danger" lay-event="del">
+          <i class="layui-icon">&#xe640;</i>
+        </button>
+      </script>
+      
+      <!--分页-->
       <script type="text/html" id="pageDemo">
         <div id="page"></div>
       </script>
-
+      
+      <!--优先级色块-->
+      <script type="text/html" id="prTpl">
+        {{# if ( d.tc_pr === '高'){ }}
+        <span class="base high">{{ d.tc_pr }}</span>
+        {{# } else if (d.tc_pr === '中'){ }}
+        <span class="base middle">{{ d.tc_pr }}</span>
+        {{# } else { }}
+        <span class="base low">{{ d.tc_pr }}</span>
+        {{# } }}
+      </script>
+      
       <script type="text/html" id="radioTpl">
         <form>
           <div class="layui-form">
-          <input type="radio" class="tc_status" name="tc_status" value="1" title="pass" lay-filter="statusDis" {{ d.tc_status === '1' ? 'checked' : '' }}>
-          <input type="radio" class="tc_status" name="tc_status" value="2" title="false" lay-filter="statusDis" {{ d.tc_status === '2' ? 'checked' : '' }}>
-          <input type="radio" class="tc_status" name="tc_status" value="3" title="block" lay-filter="statusDis" {{ d.tc_status === '3' ? 'checked' : '' }}>
-          <input type="radio" class="tc_status" name="tc_status" value="4" title="NaN" lay-filter="statusDis" {{ d.tc_status === '4' ? 'checked' : '' }}>
-      </div>
-    </form>    
-        </script>
-
+            <input type="radio" name="tc_status" value="1" title="pass" lay-filter="statusDis" {{ d.tc_status === '1' ? 'checked' : '' }}>
+            <input type="radio" name="tc_status" value="2" title="false" lay-filter="statusDis" {{ d.tc_status === '2' ? 'checked' : '' }}>
+            <input type="radio" name="tc_status" value="3" title="block" lay-filter="statusDis" {{ d.tc_status === '3' ? 'checked' : '' }}>
+            <input type="radio" name="tc_status" value="4" title="N/A" lay-filter="statusDis" {{ d.tc_status === '4' ? 'checked' : '' }}>
+          </div>
+        </form>
+      </script>
+      
       <script type="text/html" id="checkboxTpl">
-          <input type="checkbox" name="is_lock" value="{{d.is_lock}}" title="启用" lay-filter="lockDis" {{ d.is_lock == 1 ? 'checked' : ' ' }}>
-        </script>
-    </div>
+        <input type="checkbox" name="is_lock" value="{{ d.is_lock }}" title="启用" lay-filter="lockDis" {{d.is_lock == 1 ? 'checked' : '' }}>
+      </script>
 
+    </div>
+    
     <script src="../assets/lib/jquery-3.6.0.js"></script>
-    <script src="../assets/lib/tinymce/tinymce.min.js"></script>
     <script src="../assets/lib/dayjs.min.js"></script>
     <script src="../assets/lib/layui/layui.js"></script>
-
     <script src="../assets/js/baseAPI.js"></script>
     <script src="../assets/js/testcase/pro_tc.js"></script>
-</body>
-
-<form class="layui-form" id="tc-add" lay-filter="tc-add" style="display: none;">
-  <div class="layui-form-item">
-    <label class="layui-form-label"><span class="imp">*</span>用例模块</label>
-    <div class="layui-input-block">
-      <input type="text" name="tc_module" required lay-verify="required" placeholder="请输入用例模块" autocomplete="off"
-        class="layui-input" />
-    </div>
-  </div>
-  <div class="layui-form-item">
-    <label class="layui-form-label"><span class="imp">*</span>用例标题</label>
-    <div class="layui-input-block">
-      <input type="text" name="tc_title" required lay-verify="required" placeholder="请输入用例标题" autocomplete="off"
-        class="layui-input" />
-    </div>
-  </div>
-  <div class="layui-form-item">
-    <label class="layui-form-label">前提条件</label>
-    <div class="layui-input-block">
-      <textarea name="tc_pre" placeholder="请输入前提条件" class="layui-textarea"></textarea>
-    </div>
-  </div>
-  <div class="layui-form-item">
-    <label class="layui-form-label"><span class="imp">*</span>执行步骤</label>
-    <div class="layui-input-block">
-      <textarea name="tc_step" placeholder="请输入执行步骤" class="layui-textarea"></textarea>
-    </div>
-  </div>
-  <div class="layui-form-item">
-    <label class="layui-form-label"><span class="imp">*</span>预期结果</label>
-    <div class="layui-input-block">
-      <textarea name="tc_exp" placeholder="请输入预期结果" class="layui-textarea"></textarea>
-    </div>
-  </div>
-  <div class="layui-form-item">
-    <label class="layui-form-label">备注</label>
-    <div class="layui-input-block">
-      <input type="text" name="tc_remark" required lay-verify="required" placeholder="请输入备注信息" autocomplete="off"
-        class="layui-input" />
-    </div>
-  </div>
-  <div class="layui-form-item">
-    <label class="layui-form-label"><span class="imp">*</span>优先级</label>
-    <div class="layui-input-inline">
-      <select name="tc_pr" lay-verify="">
-        <option value="">请选择用例优先级</option>
-        <option value="0">高</option>
-        <option value="1">中</option>
-        <option value="2">低</option>
-      </select>
-    </div>
-  </div>
-  <div class="layui-form-item">
-    <div class="layui-inline">
-      <label class="layui-form-label">编辑时间</label>
-      <div class="layui-input-inline">
-        <input type="text" class="layui-input" id="editTime" name="edittime" placeholder="yyyy-MM-dd HH:mm:ss"
-          autocomplete="off">
+  </body>
+  
+  <form class="layui-form" id="tc-add" lay-filter="tc-add" style="display:none;">
+    <div class="layui-form-item">
+      <label class="layui-form-label"><span class="imp">*</span>用例模块</label>
+        <div class="layui-input-block">
+          <input type="text" name="tc_module" required lay-verify="required" placeholder="请输入用例模块" class="layui-input"/>
+        </div>
       </div>
-    </div>
-  </div>
-  <div class="layui-form-item">
-    <div class="layui-input-block">
-      <button class="layui-btn" lay-submit lay-filter="formDemo">
-        立即发布
-      </button>
-      <button type="reset" class="layui-btn layui-btn-primary">
-        重置
-      </button>
-    </div>
-  </div>
-</form>
+      
+      <div class="layui-form-item">
+        <label class="layui-form-label"><span class="imp">*</span>用例标题</label>
+          <div class="layui-input-block">
+            <input type="text" name="tc_title" required lay-verify="required" placeholder="请输入用例标题" autocomplete="off" class="layui-input"/>
+          </div>
+        </div>
+        
+        <div class="layui-form-item">
+          <label class="layui-form-label">前提条件</label>
+          <div class="layui-input-block">
+            <textarea name="tc_pre" placeholder="请输入前提条件" class="layui-textarea"></textarea>
+          </div>
+        </div>
+        
+        <div class="layui-form-item">
+          <label class="layui-form-label"><span class="imp">*</span>执行步骤</label>
+          <div class="layui-input-block">
+            <textarea name="tc_step" placeholder="请输入执行步骤" class="layui-textarea"></textarea>
+          </div>
+        </div>
+        
+        <div class="layui-form-item">
+          <label class="layui-form-label"><span class="imp">*</span>预期结果</label>
+          <div class="layui-input-block">
+            <textarea name="tc_exp" placeholder="请输入预期结果" class="layui-textarea"></textarea>
+          </div>
+        </div>
+        
+        <div class="layui-form-item">
+          <label class="layui-form-label">备注</label>
+          <div class="layui-input-block">
+            <input type="text" name="tc_remark" placeholder="请输入备注信息" autocomplete="off" class="layui-input"/>
+          </div>
+        </div>
+        
+        <div class="layui-form-item">
+          <div class="layui-inline">
+            <label class="layui-form-label">
+              <span class="imp">*</span>优先级</label>
+              <div class="layui-input-inline">
+                <select name="tc_pr" lay-verify="">
+                  <option value="">请选择用例优先级</option>
+                  <option value="0">高</option>
+                  <option value="1">中</option>
+                  <option value="2">低</option>
+                </select>
+              </div>
+            </div>
+          <div class="layui-inline">
+            <label class="layui-form-label">编辑时间</label>
+            <div class="layui-input-inline">
+              <input type="text" class="layui-input" id="editTime" name="edittime" placeholder="yyyy-MM-dd HH:mm:ss" autocomplete="off">
+            </div>
+          </div>
+        </div>
+        
+        <div class="layui-form-item">
+          <div class="layui-input-block">
+            <button class="layui-btn" lay-submit>立即发布</button>
+            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+          </div>
+        </div>
+      </form>
+      
+      <div class="layui-tab layui-tab-brief" id="tc-tab" style="display:none;">
+        <ul class="layui-tab-title">
+          <li class="layui-this">基本信息</li>
+          <li>执行历史</li>
+        </ul>
 
-<form class="layui-form" id="tc-edit" lay-filter="tc-edit" style="display: none;">
-  <input type="hidden" name="id">
-  <div class="layui-form-item">
-    <label class="layui-form-label"><span class="imp">*</span>用例模块</label>
-    <div class="layui-input-block">
-      <input type="text" name="tc_module" required lay-verify="required" placeholder="请输入用例模块" autocomplete="off"
-        class="layui-input" />
-    </div>
-  </div>
-  <div class="layui-form-item">
-    <label class="layui-form-label"><span class="imp">*</span>用例标题</label>
-    <div class="layui-input-block">
-      <input type="text" name="tc_title" required lay-verify="required" placeholder="请输入用例标题" autocomplete="off"
-        class="layui-input" />
-    </div>
-  </div>
-  <div class="layui-form-item">
-    <label class="layui-form-label">前提条件</label>
-    <div class="layui-input-block">
-      <textarea name="tc_pre" placeholder="请输入前提条件" class="layui-textarea"></textarea>
-    </div>
-  </div>
-  <div class="layui-form-item">
-    <label class="layui-form-label"><span class="imp">*</span>执行步骤</label>
-    <div class="layui-input-block">
-      <textarea name="tc_step" placeholder="请输入执行步骤" class="layui-textarea"></textarea>
-    </div>
-  </div>
-  <div class="layui-form-item">
-    <label class="layui-form-label"><span class="imp">*</span>预期结果</label>
-    <div class="layui-input-block">
-      <textarea name="tc_exp" placeholder="请输入预期结果" class="layui-textarea"></textarea>
-    </div>
-  </div>
-  <div class="layui-form-item">
-    <label class="layui-form-label">备注</label>
-    <div class="layui-input-block">
-      <input type="text" name="tc_remark" required lay-verify="required" placeholder="请输入备注信息" autocomplete="off"
-        class="layui-input" />
-    </div>
-  </div>
-  <div class="layui-form-item">
-    <label class="layui-form-label"><span class="imp">*</span>优先级</label>
-    <div class="layui-input-inline">
-      <select name="tc_pr" lay-verify="">
-        <option value="">请选择用例优先级</option>
-        <option value="0">高</option>
-        <option value="1">中</option>
-        <option value="2">低</option>
-      </select>
-    </div>
-  </div>
-  <div class="layui-form-item">
-    <div class="layui-inline">
-      <label class="layui-form-label">编辑时间</label>
-      <div class="layui-input-inline">
-        <input type="text" class="layui-input" id="editTime" name="edittime" placeholder="yyyy-MM-dd HH:mm:ss"
-          autocomplete="off">
+        <div class="layui-tab-content">
+          <div class="layui-tab-item layui-show">
+            <form class="layui-form" id="tc-edit" lay-filter="tc-edit">
+
+              <input type="hidden" name="id">
+
+              <div class="layui-form-item">
+                <label class="layui-form-label"><span class="imp">*</span>用例模块</label>
+                <div class="layui-input-block">
+                  <input type="text" name="tc_module" required lay-verify="required" placeholder="请输入用例模块" class="layui-input"/>
+                </div>
+              </div>
+              
+              <div class="layui-form-item">
+                <label class="layui-form-label"><span class="imp">*</span>用例标题</label>
+                <div class="layui-input-block">
+                  <input type="text" name="tc_title" required lay-verify="required" placeholder="请输入用例标题" autocomplete="off" class="layui-input"/>
+                </div>
+              </div>
+              
+              <div class="layui-form-item">
+                <label class="layui-form-label">前提条件</label>
+                <div class="layui-input-block">
+                  <textarea name="tc_pre" placeholder="请输入前提条件" class="layui-textarea"></textarea>
+                </div>
+              </div>
+              
+              <div class="layui-form-item">
+                <label class="layui-form-label"><span class="imp">*</span>执行步骤</label>
+                <div class="layui-input-block">
+                  <textarea name="tc_step" placeholder="请输入执行步骤" class="layui-textarea"></textarea>
+                </div>
+              </div>
+              
+              <div class="layui-form-item">
+                <label class="layui-form-label"><span class="imp">*</span>预期结果</label>
+                <div class="layui-input-block">
+                  <textarea name="tc_exp" placeholder="请输入预期结果" class="layui-textarea"></textarea>
+                </div>
+              </div>
+              
+              <div class="layui-form-item">
+                <label class="layui-form-label">备注</label>
+                <div class="layui-input-block">
+                  <input type="text" name="tc_remark" placeholder="请输入备注信息" autocomplete="off" class="layui-input"/>
+                </div>
+              </div>
+              
+              <div class="layui-form-item">
+                <div class="layui-inline">
+                  <label class="layui-form-label"><span class="imp">*</span>优先级</label>
+                  <div class="layui-input-inline">
+                    <select name="tc_pr" lay-verify="">
+                      <option value="">请选择用例优先级</option>
+                      <option value="0">高</option>
+                      <option value="1">中</option>
+                      <option value="2">低</option>
+                    </select>
+                  </div>
+                </div>
+                
+                <div class="layui-inline">
+                  <label class="layui-form-label">编辑时间</label>
+                  <div class="layui-input-inline">
+                    <input type="text" class="layui-input" id="editTime" name="edittime" placeholder="yyyy-MM-dd HH:mm:ss" autocomplete="off">
+                  </div>
+                </div>
+
+              </div>
+
+              <div class="layui-form-item">
+                <div class="layui-input-block">
+                  <button class="layui-btn" lay-submit>立即发布</button>
+                  <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                </div>
+              </div>
+            </form>
+          </div>
+
+          <div class="layui-tab-item"></div>
+        
+        </div>
       </div>
-    </div>
-  </div>
-  <div class="layui-form-item">
-    <div class="layui-input-block">
-      <button class="layui-btn" lay-submit lay-filter="formDemo">
-        立即发布
-      </button>
-      <button type="reset" class="layui-btn layui-btn-primary">
-        重置
-      </button>
-    </div>
-  </div>
-</form>
-
+      
+      <div class="layui-card" id="tc-re" style="display:none;">
+        <div class="layui-card-header" style="margin-top: 10px;"><span><i class="layui-icon">&#xe66c;</i> 用例摘要</span></div>
+        <div class="layui-card-body" style="overflow: hidden;">
+          <div class="card">
+            <span class="style style1"></span>
+            <span class="txt-sty">总用例数</span>
+          </div>
+          <div class="card">
+            <span class="style style2"></span>
+            <span class="txt-sty">通过数</span>
+          </div>
+          <div class="card">
+            <span class="style style3">100</span>
+            <span class="txt-sty">未通过数</span>
+          </div>
+          <div class="card">
+            <span class="style style4">100</span>
+            <span class="txt-sty">阻塞数</span>
+          </div>
+          <div class="card">
+            <span class="style style5">100</span>
+            <span class="txt-sty">不适用数</span>
+          </div>
+          <div class="card">
+            <span class="style style6">100</span>
+            <span class="txt-sty">未测试数</span>
+          </div>
+        </div>
+        <div class="layui-card-header"><span><i class="layui-icon">&#xe66c;</i> 用例启用摘要</span></div>
+        <div class="layui-card-body" style="overflow: hidden;">
+          <div class="card">
+            <span class="style style1"></span>
+            <span class="txt-sty">总用例数</span>
+          </div>
+          <div class="card">
+            <span class="style style7"></span>
+            <span class="txt-sty">启用用例</span>
+          </div>
+        </div>
+        <div class="layui-card-header"><span><i class="layui-icon">&#xe66c;</i> 优先级摘要</span></div>
+        <div class="layui-card-body" style="overflow: hidden;">
+          <div class="card">
+            <span class="style style8"></span>
+            <span class="txt-sty">高</span>
+          </div>
+          <div class="card">
+            <span class="style style9"></span>
+            <span class="txt-sty">中</span>
+          </div>
+          <div class="card">
+            <span class="style style10"></span>
+            <span class="txt-sty">低</span>
+          </div>
+        </div>
+        <div class="layui-card-header"><span><i class="layui-icon">&#xe66c;</i> 缺陷摘要</span></div>
+        <div class="layui-card-body">
+          <div class="card">
+            <span class="style">100</span>
+            <span class="txt-sty">bug数</span>
+          </div>
+        </div>
+      </div>
 </html>

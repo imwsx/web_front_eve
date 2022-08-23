@@ -1,20 +1,90 @@
 body {
-    background-color: #f2f3f5;
-    padding: 15px !important;
+  background-color: #f2f3f5;
+  padding: 15px !important;
 }
-
 .layui-card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
-
 #tc-add,
-#form-edit {
-    padding-top: 20px;
-    padding-right: 35px;
+#tc-edit {
+  padding-top: 10px;
+  padding-right: 35px;
+}
+.imp {
+  color: #ff0000;
+}
+.base {
+  display: inline-block;
+  width: 40px;
+  border-radius: 10px;
+}
+.high {
+  background-color: #ff0000;
+  color: #fff;
+}
+.middle {
+  background-color: #f4fa58;
+}
+.low {
+  background-color: #dcdcdc;
+}
+.tc-report {
+  margin-top: 10px !important;
+}
+.layui-card-header > span {
+  padding: 0 10px;
+  background-color: #ecf0f1;
+  border-radius: 5px;
+  font-weight: 700 !important;
+  letter-spacing: 1px;
+}
+.card {
+  float: left;
+  width: 65px;
+  height: 65px;
+  margin-right: 20px;
+  padding: 15px;
+}
+.txt-sty {
+  text-align: center;
+  display: block;
+  font-size: 16px;
+}
+.style {
+  text-align: center;
+  display: block;
+  font-weight: 700;
+  font-size: 24px;
+}
+.style1 {
+  color: blue;
+}
+.style2 {
+  color: green;
+}
+.style3 {
+  color: red;
+}
+.style4,
+.style5,
+.style6 {
+  color: gray;
 }
 
-.imp {
-    color: #ff0000;
+.style7 {
+  color: green;
 }
+
+.style8 {
+  color: #ff0000;
+}
+.style9 {
+  color: #f4fa58;
+}
+.style10 {
+  color: #dcdcdc;
+}
+
+

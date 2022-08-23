@@ -5,11 +5,12 @@ $(function () {
   var dropdown = layui.dropdown;
   var laydate = layui.laydate;
 
-  initProCateList();
+  initTcList();
 
-  function initProCateList() {
+  var addIndex = null;
+  var editIndex = null;
+  function initTcList() {
     layui.use(["table", "dropdown"], function () {
-      // 创建渲染实例
       table.render({
         elem: "#test",
         id: "idTest",
@@ -27,22 +28,26 @@ $(function () {
         defaultToolbar: [
           "filter",
           "exports",
-          "print",
+          {
+            title: "刷新",
+            layEvent: "fresh",
+            icon: "layui-icon-refresh",
+          },
           {
             title: "帮助",
             layEvent: "help",
             icon: "layui-icon-tips",
           },
         ],
-        title: "上位机软件测试用例" + dayjs(new Date()).format("YYYY-MM-DD"),
-        height: "full-200", // 最大高度减去其他容器已占有的高度差
+        title: "上位机软件测试用例" + dateFormat(1),
+        height: "full-200",
         cellMinWidth: 80,
         page: {
           layout: ["count", "limit", "prev", "page", "next", "skip"],
           limits: [2, 3, 5, 10],
-          groups: 1, //只显示 1 个连续页码
-          first: false, //不显示首页
-          last: false, //不显示尾页
+          groups: 5,
+          first: 1,
+          last: "count",
         },
         cols: [
           [
@@ -50,8 +55,7 @@ $(function () {
             {
               field: "id",
               title: "ID",
-              width: 80,
-              // width: 80,
+              width: 70,
               fixed: "left",
               sort: true,
               align: "center",
@@ -66,15 +70,12 @@ $(function () {
             {
               field: "tc_title",
               title: "用例标题",
-              // width: 180,
               edit: "textarea",
               align: "center",
             },
             {
               field: "tc_pre",
               title: "前提条件",
-              // width: 260,
-              // minWidth: 160,
               edit: "textarea",
               style: "-moz-box-align: start;",
               hide: true,
@@ -82,26 +83,24 @@ $(function () {
             {
               field: "tc_step",
               title: "执行步骤",
-              // width: 260,
               edit: "textarea",
             },
             {
               field: "tc_exp",
               title: "预期结果",
-              // width: 260,
               edit: "textarea",
             },
             {
               field: "tc_remark",
               title: "备注",
-              // width: 180,
               edit: "textarea",
               hide: true,
             },
             {
               field: "tc_pr",
               title: "优先级",
-              width: 80,
+              width: 75,
+              templet: "#prTpl",
               align: "center",
             },
             {
@@ -114,7 +113,7 @@ $(function () {
             {
               field: "tc_status",
               title: "状态",
-              width: 250,
+              width: 235,
               templet: "#radioTpl",
               align: "center",
               unresize: true,
@@ -131,9 +130,8 @@ $(function () {
             {
               fixed: "right",
               title: "操作",
-              width: 180,
+              width: 150,
               toolbar: "#barDemo",
-              // minWidth: 180,
               align: "center",
               unresize: true,
             },
@@ -161,10 +159,9 @@ $(function () {
                 title: "获取当前页数据",
               },
             ],
-            //菜单被点击的事件
             click: function (obj) {
               var checkStatus = table.checkStatus(id);
-              var data = checkStatus.data; // 获取选中的数据
+              var data = checkStatus.data;
               switch (obj.id) {
                 case "isAll":
                   layer.msg(checkStatus.isAll ? "全选" : "未全选");
@@ -186,40 +183,120 @@ $(function () {
         },
       });
 
-      // 工具栏事件
+      //工具栏事件
       table.on("toolbar(test)", function (obj) {
+        var checkStatus = table.checkStatus("idTest");
         switch (obj.event) {
           case "addData":
-            layer.open({
+            addIndex = layer.open({
               title: "编辑",
               type: 1,
               area: ["50%", "91%"],
               content: $("#tc-add"),
             });
             break;
+          case "saveAll":
+            for (let i = 0; i < checkStatus.data.length; i++) {
+              checkStatus.data[i].tc_pr = prToNum(checkStatus.data[i].tc_pr);
+              if (flag1) checkStatus.data[i].tc_status = tc_status_value;
+              if (flag2) checkStatus.data[i].is_lock = tc_lock_value;
+              $.ajax({
+                method: "POST",
+                url: "/my/testcase/updatetc",
+                data: checkStatus.data[i],
+                success: function (res) {
+                  if (res.status !== 0) {
+                    return layer.msg("保存失败!");
+                  } else {
+                    layer.msg("保存成功!");
+                  }
+                },
+              });
+            }
+            initTcList();
+            break;
           case "deleteAll":
             layer.confirm("确定删除选中用例吗？", function (index) {
-              obj.del();
+              var arr = [];
+              for (let i = 0; i < checkStatus.data.length; i++) {
+                arr.push(checkStatus.data[i].id);
+              }
+              for (let i = 0; i < arr.length; i++) {
+                $.ajax({
+                  method: "GET",
+                  url: "/my/testcase/deletetc/" + arr[i],
+                  success: function (res) {
+                    if (res.status !== 0) {
+                      return layer.msg("删除失败!");
+                    } else {
+                      layer.msg("删除成功!");
+                    }
+                  },
+                });
+              }
+              initTcList();
               layer.close(index);
             });
             break;
-          case "multi-row":
-            table.reload("idTest", {
-              lineStyle: "height: 95px;",
+          case "report":
+            reIndex = layer.open({
+              title: "迭代报告",
+              type: 1,
+              area: ["50%", "92%"],
+              content: $("#tc-re"),
+              success: function () {
+                $.ajax({
+                  method: "GET",
+                  url: "/my/testcase/tcs/status",
+                  success: function (res) {
+                    if (res.status !== 0) {
+                      return layer.msg("获取失败!");
+                    } else {
+                      // layer.msg("获取成功!");
+                      $(".style1").text(res.total[0]);
+                      $(".style2").text(res.total[1]);
+                      $(".style3").text(res.total[2]);
+                      $(".style4").text(res.total[3]);
+                      $(".style5").text(res.total[4]);
+                      $(".style6").text(res.total[5]);
+                      $(".style7").text(res.total[6]);
+                    }
+                  },
+                });
+                $.ajax({
+                  method: "GET",
+                  url: "/my/testcase/tcs/pr",
+                  success: function (res) {
+                    if (res.status !== 0) {
+                      return layer.msg("获取失败!");
+                    } else {
+                      // layer.msg("获取成功!");
+                      $(".style8").text(res.total[0]);
+                      $(".style9").text(res.total[1]);
+                      $(".style10").text(res.total[2]);
+                    }
+                  },
+                });
+              },
             });
+            break;
+          case "multi-row":
+            table.reload("idTest", { lineStyle: "height:95px;" });
             layer.msg("已设为多行");
             break;
           case "default-row":
-            table.reload("idTest", {
-              lineStyle: null,
-            });
+            table.reload("idTest", { lineStyle: null });
             layer.msg("已设为单行");
             break;
+          case "fresh":
+            table.reload("idTest", { url: "/my/testcase/tcs" });
+            break;
           case "help":
-            layer.alert("有事请找 wsx");
+            layer.alert("用例标题不可重复");
             break;
         }
       });
+
       //触发单元格工具事件
       table.on("tool(test)", function (obj) {
         if (obj.event === "save") {
@@ -235,22 +312,33 @@ $(function () {
                 return layer.msg("保存失败!");
               } else {
                 layer.msg("保存成功!");
-                initProCateList();
+                initTcList();
               }
             },
           });
         } else if (obj.event === "del") {
-          // if (checkStatus.data.length !== 1) return layer.msg("请选择一行");
-          layer.confirm("确定删除该产品吗？", function (index) {
-            obj.del();
-            layer.close(index);
+          layer.confirm("确定删除该用例吗？", function (index) {
+            var id = obj.data.id;
+            $.ajax({
+              method: "GET",
+              url: "/my/testcase/deletetc/" + id,
+              success: function (res) {
+                if (res.status !== 0) {
+                  return layer.msg("删除失败!");
+                } else {
+                  layer.msg("删除成功!");
+                  initTcList();
+                  layer.close(index);
+                }
+              },
+            });
           });
         } else if (obj.event === "edit") {
-          layer.open({
+          editIndex = layer.open({
             title: "编辑",
             type: 1,
-            area: ["50%", "91%"],
-            content: $("#tc-edit"),
+            area: ["50%", "87%"],
+            content: $("#tc-tab"),
             success: function () {
               $("#tc-edit input:first").attr("value", obj.data.id);
               form.val("tc-edit", {
@@ -261,17 +349,19 @@ $(function () {
                 tc_exp: obj.data.tc_exp,
                 tc_remark: obj.data.tc_remark,
                 tc_pr: prToNum(obj.data.tc_pr),
-                edittime: dayjs(new Date()).format("YYYY-MM-DD HH:mm:ss"),
+                edittime: dateFormat(2),
               });
             },
           });
         }
       });
+
       //触发表格复选框选择
       table.on("checkbox(test)", function (obj) {});
 
       var flag1 = false;
       var flag2 = false;
+
       form.on("radio(statusDis)", function (obj) {
         flag1 = true;
         return (tc_status_value = obj.value);
@@ -289,27 +379,13 @@ $(function () {
       //触发表格单选框选择
       table.on("radio(test)", function (obj) {});
 
-      // 行单击事件
-      table.on("row(test)", function (obj) {
-        // var data = obj.data;
-        // layer.prompt(
-        //   {
-        //     formType: 2,
-        //     title: "修改型号： [" + data.pro_model + "] 的 ",
-        //     value: data.sign,
-        //   },
-        //   function (value, index) {
-        //     layer.close(index);
-        //     // 发送Ajax请求
-        //     obj.update({
-        //       sign: value,
-        //     });
-        //   }
-        // );
-      });
-      // 行双击事件
+      //行单击事件
+      table.on("row(test)", function (obj) {});
+
+      //行双击事件
       table.on("rowDouble(test)", function (obj) {});
-      // 单元格编辑事件
+
+      //单元格编辑事件
       table.on("edit(test)", function (obj) {
         var field = obj.field, //得到字段
           value = obj.value, //得到修改后的值
@@ -344,7 +420,8 @@ $(function () {
           return layer.msg("用例添加失败!");
         } else {
           layer.msg("用例添加成功!");
-          initProCateList();
+          initTcList();
+          layer.close(addIndex);
         }
       },
     });
@@ -362,7 +439,8 @@ $(function () {
           return layer.msg("用例更新失败!");
         } else {
           layer.msg("用例更新成功!");
-          initProCateList();
+          initTcList();
+          layer.close(editIndex);
         }
       },
     });
@@ -393,6 +471,15 @@ $(function () {
         return 1;
       case "低":
         return 2;
+    }
+  }
+
+  function dateFormat(key) {
+    switch (key) {
+      case 1:
+        return dayjs(new Date()).format("YYYY-MM-DD");
+      case 2:
+        return dayjs(new Date()).format("YYYY-MM-DDHH:mm:ss");
     }
   }
 });
